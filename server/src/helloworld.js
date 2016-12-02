@@ -1,4 +1,5 @@
-//Import reverseString;
+// Import reverseString;
+// (function (exports, require, module,))
 
 var util= require('./util');
 var reverseString = util.reverseString;
