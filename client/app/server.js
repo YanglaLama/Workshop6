@@ -30,20 +30,6 @@ function getFeedItemSync(feedItemId) {
 /**
  * Emulates a REST call to get the feed data for a particular user.
  */
-// export function getFeedData(user, cb) {
-//   var xhr = new XMLHttpRequest();
-//   xhr.open('GET', '/user/4/feed');
-//   xhr.setRequestHeader('Authorization', 'bearer eyJpZCI6NH0=');
-//   xhr.addEventListener('load', function() {
-//     // Call the callback with the data.
-//     cb(JSON.parse(xhr.responseText));
-//   });
-//   xhr.send();
-// }
-
-/**
- * Emulates a REST call to get the feed data for a particular user.
-*/
 export function getFeedData(user, cb) {
   // We don't need to send a body, so pass in 'undefined' for the body.
   sendXHR('GET', '/user/4/feed', undefined, (xhr) => {
@@ -56,41 +42,14 @@ export function getFeedData(user, cb) {
  * Adds a new status update to the database.
  */
 export function postStatusUpdate(user, location, contents, cb) {
-  // If we were implementing this for real on an actual server, we would check
-  // that the user ID is correct & matches the authenticated user. But since
-  // we're mocking it, we can be less strict.
-
-  // Get the current UNIX time.
-  var time = new Date().getTime();
-  // The new status update. The database will assign the ID for us.
-  var newStatusUpdate = {
-    "likeCounter": [],
-    "type": "statusUpdate",
-    "contents": {
-      "author": user,
-      "postDate": time,
-      "location": location,
-      "contents": contents,
-      "likeCounter": []
-    },
-    // List of comments on the post
-    "comments": []
-  };
-
-  // Add the status update to the database.
-  // Returns the status update w/ an ID assigned.
-  newStatusUpdate = addDocument('feedItems', newStatusUpdate);
-
-  // Add the status update reference to the front of the current user's feed.
-  var userData = readDocument('users', user);
-  var feedData = readDocument('feeds', userData.feed);
-  feedData.contents.unshift(newStatusUpdate._id);
-
-  // Update the feed object.
-  writeDocument('feeds', feedData);
-
-  // Return the newly-posted object.
-  emulateServerReturn(newStatusUpdate, cb);
+  sendXHR('POST', '/feeditem', {
+    userId: user,
+    location: location,
+    contents: contents
+  }, (xhr) => {
+  // Return the new status update.
+    cb(JSON.parse(xhr.responseText));
+  });
 }
 
 /**
@@ -235,7 +194,7 @@ export function searchForFeedItems(userId, queryText, cb) {
   );
 }
 
-var token = "eyJpZCI6NH0=";
+var token = 'eyJpZCI6NH0='; // <-- Put your base64'd JSON token here
 
 /**
  * Properly configure+send an XMLHttpRequest with error handling,
@@ -243,7 +202,8 @@ var token = "eyJpZCI6NH0=";
  */
 function sendXHR(verb, resource, body, cb) {
   var xhr = new XMLHttpRequest();
-  xhr.open(verb, resource); xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+  xhr.open(verb, resource);
+  xhr.setRequestHeader('Authorization', 'Bearer ' + token);
   // The below comment tells ESLint that FacebookError is a global.
   // Otherwise, ESLint would complain about it! (See what happens in Atom if
   // you remove the comment...)
@@ -291,7 +251,9 @@ function sendXHR(verb, resource, body, cb) {
       xhr.send(body);
       break;
     case 'object':
-      // Tell the server we are sending JSON. xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8"); // Convert body into a JSON string.
+      // Tell the server we are sending JSON.
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      // Convert body into a JSON string.
       xhr.send(JSON.stringify(body));
       break;
     default:
