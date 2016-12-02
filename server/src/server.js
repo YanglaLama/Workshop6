@@ -157,7 +157,9 @@ function postStatusUpdate(user, location, contents) {
   }
 });
 
-// Reset database
+/**
+ * Reset database
+ */
 app.post('/resetdb', function(req, res) {
    console.log("Resetting database...");
    // This is a debug route, so don't do any validation.
