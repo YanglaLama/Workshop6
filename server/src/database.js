@@ -1,4 +1,5 @@
 // Data goes here.
+// Read the Migrate Data to Mock Database on Server part on Workshop- yay!
 var initialData = {
   // The "user" collection. Contains all of the users in our Facebook system.
   "users": {
