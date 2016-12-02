@@ -76,15 +76,6 @@ function getFeedData(user) {
   return feedData;
 }
 
-/**
- * Get the feed data for a particular user
- */
- // app.get('/user/:userid/feed', function(req, res) {
- //   // URL parameters are stored in req. parameters
- //   var userid = req.params.userid;
- //   // Send response
- //   res.send(getFeedData(userid));
- // });
 
  /**
   * Get the user ID from a token. Returns -1 (an invalid ID)
